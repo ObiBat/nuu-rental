@@ -235,15 +235,6 @@ const ContactModal = ({ isOpen, onClose }) => {
                             )}
                         </form>
 
-                        {/* Footer */}
-                        <div className="px-6 py-4 border-t border-white/10 bg-white/5">
-                            <p className="text-steel font-mono text-xs text-center">
-                                Or email us directly at{' '}
-                                <a href="mailto:hello@nuu.agency" className="text-signal hover:underline">
-                                    hello@nuu.agency
-                                </a>
-                            </p>
-                        </div>
                     </motion.div>
                 </>
             )}
