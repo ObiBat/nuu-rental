@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Box, useScroll, Float } from '@react-three/drei';
+import { Box, Float } from '@react-three/drei';
 import * as THREE from 'three';
 
 // --- Materials ---
@@ -49,20 +49,26 @@ const GlassMaterial = new THREE.MeshPhysicalMaterial({
 
 // --- Components ---
 
-const Furniture = ({ type, position, rotation = [0, 0, 0], scale = 1 }) => {
+const Furniture = ({ type, position, rotation = [0, 0, 0], scale = 1, scrollProgress }) => {
     const mesh = useRef();
-    const scroll = useScroll();
 
     useFrame(() => {
-        // Furniture appears as you scroll
-        const r = scroll.range(0, 1);
-        // Smooth step for visibility
-        const visible = r > 0.2;
+        const r = scrollProgress ? scrollProgress.get() : 0;
 
         if (mesh.current) {
-            // Scale up from 0 when scrolling starts
-            const s = THREE.MathUtils.lerp(0, scale, r * 1.5);
-            mesh.current.scale.setScalar(Math.min(s, scale));
+            // Intensified "Pop" animation
+            // Appear earlier and faster
+            const progress = THREE.MathUtils.smoothstep(r, 0.05, 0.4);
+
+            // Elastic pop effect
+            let s = progress;
+            if (progress > 0 && progress < 1) {
+                s = progress + Math.sin(progress * Math.PI) * 0.1; // Slight bounce
+            }
+
+            const finalScale = THREE.MathUtils.lerp(0, scale, s);
+            mesh.current.scale.setScalar(finalScale);
+            mesh.current.visible = finalScale > 0.01;
         }
     });
 
@@ -108,14 +114,94 @@ const Furniture = ({ type, position, rotation = [0, 0, 0], scale = 1 }) => {
         );
     }
 
+    if (type === 'tv') {
+        return (
+            <group position={position} rotation={rotation} ref={mesh}>
+                {/* Screen */}
+                <Box args={[1.5, 0.9, 0.05]} position={[0, 0, 0]} material={new THREE.MeshStandardMaterial({ color: '#111', roughness: 0.2 })} />
+                {/* Stand/Console */}
+                <Box args={[1.8, 0.4, 0.4]} position={[0, -0.8, 0]} material={FurnitureMaterial} castShadow />
+            </group>
+        )
+    }
+
+    if (type === 'art') {
+        return (
+            <group position={position} rotation={rotation} ref={mesh}>
+                <Box args={[1, 1.2, 0.05]} position={[0, 0, 0]} material={AccentMaterial} />
+                <Box args={[1.1, 1.3, 0.02]} position={[0, 0, -0.02]} material={FurnitureMaterial} />
+            </group>
+        )
+    }
+
     return null;
 };
 
-const Room = ({ position, size, delay = 0, children }) => {
+const Wall = ({ args, position, material, castShadow, receiveShadow, scrollProgress }) => {
+    const mesh = useRef();
+
+    useFrame(() => {
+        if (mesh.current && scrollProgress) {
+            const r = scrollProgress.get();
+            // Transition from Blank White (#ffffff) to Designed Feature Wall
+            // Let's use a stylish dark grey/blue for high contrast "Design" look
+            const targetColor = new THREE.Color('#2c3e50'); // Dark Blue-Grey Feature Wall
+            const initialColor = new THREE.Color('#ffffff'); // White
+
+            // Make the transition happen earlier and faster to be noticeable
+            const progress = THREE.MathUtils.smoothstep(r, 0.05, 0.5);
+            mesh.current.material.color.lerpColors(initialColor, targetColor, progress);
+
+            // Also adjust roughness to make it look more "matte" painted vs glossy white
+            // Note: We can modify the material properties directly as it's a clone
+            mesh.current.material.roughness = THREE.MathUtils.lerp(0.9, 0.4, progress);
+        }
+    });
+
+    return (
+        <Box
+            ref={mesh}
+            args={args}
+            position={position}
+            material={material.clone()} // Clone to allow independent color updates
+            castShadow={castShadow}
+            receiveShadow={receiveShadow}
+        />
+    );
+};
+
+const Floor = ({ args, position, receiveShadow, scrollProgress }) => {
+    const mesh = useRef();
+
+    useFrame(() => {
+        if (mesh.current && scrollProgress) {
+            const r = scrollProgress.get();
+            // Transition from White (#ffffff) to Timber (#8d6e63)
+            const targetColor = new THREE.Color('#8d6e63'); // Warm Timber
+            const initialColor = new THREE.Color('#ffffff'); // White
+
+            // Transition matches the walls
+            const progress = THREE.MathUtils.smoothstep(r, 0.05, 0.5);
+            mesh.current.material.color.lerpColors(initialColor, targetColor, progress);
+
+            // Timber is smoother than matte white
+            mesh.current.material.roughness = THREE.MathUtils.lerp(0.9, 0.3, progress);
+        }
+    });
+
+    return (
+        <Box
+            ref={mesh}
+            args={args}
+            position={position}
+            material={DesignedFloorMaterial.clone()}
+            receiveShadow={receiveShadow}
+        />
+    );
+};
+
+const Room = ({ position, size, delay = 0, children, scrollProgress }) => {
     const group = useRef();
-    const floorRef = useRef();
-    const wallsRef = useRef();
-    const scroll = useScroll();
 
     // 1. Assembly on Load (Time-based)
     useFrame((state) => {
@@ -131,12 +217,6 @@ const Room = ({ position, size, delay = 0, children }) => {
         } else {
             group.current.scale.y = 0;
         }
-
-        // 2. Material Transition on Scroll
-        const r = scroll.range(0, 1); // 0 to 1 based on scroll
-
-        // Interpolate colors/materials if needed, or just rely on the furniture appearing
-        // to change the look. For now, let's keep the walls clean white/grey.
     });
 
     const wallThickness = 0.2;
@@ -145,33 +225,34 @@ const Room = ({ position, size, delay = 0, children }) => {
     return (
         <group position={[position[0], 0, position[2]]}>
             <group ref={group}>
-                {/* Floor */}
-                <Box
-                    ref={floorRef}
+                {/* Floor - Now Animated */}
+                <Floor
                     args={[width, 0.1, depth]}
                     position={[0, -height / 2 + 0.05, 0]}
-                    material={DesignedFloorMaterial}
                     receiveShadow
+                    scrollProgress={scrollProgress}
                 />
 
-                {/* Walls Group */}
-                <group ref={wallsRef}>
+                {/* Walls Group - Using custom Wall component for color transition */}
+                <group>
                     {/* Back Wall */}
-                    <Box
+                    <Wall
                         args={[width, height, wallThickness]}
                         position={[0, 0, -depth / 2 + wallThickness / 2]}
                         material={DesignedWallMaterial}
                         castShadow
                         receiveShadow
+                        scrollProgress={scrollProgress}
                     />
 
                     {/* Front Wall (Glass/Partial) */}
-                    <Box
+                    <Wall
                         args={[width * 0.3, height, wallThickness]}
                         position={[-width / 2 + (width * 0.15), 0, depth / 2 - wallThickness / 2]}
                         material={DesignedWallMaterial}
                         castShadow
                         receiveShadow
+                        scrollProgress={scrollProgress}
                     />
                     <Box
                         args={[width * 0.7, height * 0.8, wallThickness / 2]}
@@ -180,44 +261,58 @@ const Room = ({ position, size, delay = 0, children }) => {
                     />
 
                     {/* Left Wall */}
-                    <Box
+                    <Wall
                         args={[wallThickness, height, depth]}
                         position={[-width / 2 + wallThickness / 2, 0, 0]}
                         material={DesignedWallMaterial}
                         castShadow
                         receiveShadow
+                        scrollProgress={scrollProgress}
                     />
 
                     {/* Right Wall */}
-                    <Box
+                    <Wall
                         args={[wallThickness, height, depth]}
                         position={[width / 2 - wallThickness / 2, 0, 0]}
                         material={DesignedWallMaterial}
                         castShadow
                         receiveShadow
+                        scrollProgress={scrollProgress}
                     />
                 </group>
 
-                {/* Furniture Container (scales independently of assembly if needed, but here it rides with the room) */}
+                {/* Furniture Container */}
                 <group position={[0, -height / 2, 0]}>
-                    {children}
+                    {React.Children.map(children, child =>
+                        React.cloneElement(child, { scrollProgress })
+                    )}
                 </group>
             </group>
         </group>
     );
 };
 
-const FloorPlan = () => {
+const FloorPlan = ({ scrollProgress }) => {
     const group = useRef();
-    const scroll = useScroll();
 
-    // Rotate based on scroll
-    useFrame(() => {
+    // Rotate based on scroll + Infinite Idle
+    useFrame((state) => {
         if (group.current) {
-            const r = scroll.range(0, 1);
-            // Start at slight angle, rotate to show full layout
-            group.current.rotation.y = 0.5 + (r * 1.5);
-            // Also tilt slightly down as we scroll to see inside better
+            const r = scrollProgress ? scrollProgress.get() : 0;
+            const t = state.clock.getElapsedTime();
+
+            // 1. Infinite Idle Rotation (slowly spins when at top/stopped)
+            const idleRotation = t * 0.05;
+
+            // 2. Scroll Rotation (Full 360 view + Extra Spins)
+            // "Add one more rotation on each side" -> Let's double the range to 4PI (2 full spins)
+            // This gives a very active "inspecting" feel
+            const scrollRotation = -r * (Math.PI * 4);
+
+            // Combine them. Start at 0.5 offset to show best initial angle.
+            group.current.rotation.y = 0.5 + idleRotation + scrollRotation;
+
+            // Tilt slightly down as we scroll to see inside better
             group.current.rotation.x = r * 0.2;
         }
     });
@@ -226,23 +321,29 @@ const FloorPlan = () => {
         <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5}>
             <group ref={group} position={[0, -1, 0]} rotation={[0, 0.5, 0]}>
                 {/* Living Room */}
-                <Room position={[0, 0, 0]} size={[4, 2.5, 5]} delay={0.5}>
+                <Room position={[0, 0, 0]} size={[4, 2.5, 5]} delay={0.5} scrollProgress={scrollProgress}>
                     <Furniture type="sofa" position={[0, 0.2, -1.5]} />
                     <Furniture type="table" position={[0, 0, 1]} />
+                    {/* TV on Right Wall */}
+                    <Furniture type="tv" position={[1.8, 1.2, -1.5]} rotation={[0, -Math.PI / 2, 0]} />
+                    {/* Art on Back Wall */}
+                    <Furniture type="art" position={[-1, 1.5, -2.3]} />
                 </Room>
 
                 {/* Bedroom */}
-                <Room position={[-3.5, 0, -1]} size={[3, 2.5, 3]} delay={0.8}>
+                <Room position={[-3.5, 0, -1]} size={[3, 2.5, 3]} delay={0.8} scrollProgress={scrollProgress}>
                     <Furniture type="bed" position={[0, 0.2, 0]} rotation={[0, Math.PI / 2, 0]} />
+                    {/* Art above bed */}
+                    <Furniture type="art" position={[0, 1.5, -1.3]} scale={0.8} />
                 </Room>
 
                 {/* Kitchen */}
-                <Room position={[3.5, 0, -0.5]} size={[3, 2.5, 4]} delay={1.1}>
+                <Room position={[3.5, 0, -0.5]} size={[3, 2.5, 4]} delay={1.1} scrollProgress={scrollProgress}>
                     <Furniture type="kitchen_island" position={[0, 0, 0]} />
                 </Room>
 
                 {/* Bathroom */}
-                <Room position={[-3.5, 0, 2]} size={[3, 2.5, 3]} delay={1.4}>
+                <Room position={[-3.5, 0, 2]} size={[3, 2.5, 3]} delay={1.4} scrollProgress={scrollProgress}>
                     {/* Simple bath block */}
                     <Box args={[1, 0.5, 2]} position={[-0.8, -1, 0]} material={BlankMaterial} />
                 </Room>
@@ -257,4 +358,4 @@ const FloorPlan = () => {
     );
 };
 
-export default FloorPlan;
+export { FloorPlan };

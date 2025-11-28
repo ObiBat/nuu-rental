@@ -14,16 +14,22 @@ function App() {
       <FluidNav />
 
       <main>
-        <Hero />
-        <AiSearch />
+        <section id="os">
+          <Hero />
+        </section>
+
+        <section id="intelligence">
+          <AiSearch />
+        </section>
+
         <Features />
         <Testimonials />
 
         {/* CTA Section */}
-        <section className="py-32 bg-signal relative overflow-hidden">
+        <section id="manifesto" className="py-32 bg-signal relative overflow-hidden">
           <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
             <h2 className="text-5xl md:text-7xl font-display font-bold text-white mb-8 tracking-tighter">
-              INITIALIZE<br />YOUR MOVE.
+              INITIALISE<br />YOUR MOVE.
             </h2>
             <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto font-mono">
               Join the network. Experience the future of relocation.

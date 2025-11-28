@@ -1,12 +1,12 @@
 import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Environment, ContactShadows, ScrollControls } from '@react-three/drei';
-import FloorPlan from './FloorPlan';
+import { Environment, ContactShadows } from '@react-three/drei';
+import { FloorPlan } from './FloorPlan';
 import TechGrid from './TechGrid';
 
-const ArchitecturalScene = () => {
+const ArchitecturalScene = ({ scrollProgress }) => {
     return (
-        <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 z-0">
             <Canvas
                 shadows
                 camera={{ position: [8, 6, 8], fov: 35 }}
@@ -15,26 +15,26 @@ const ArchitecturalScene = () => {
             >
                 <Suspense fallback={null}>
                     {/* Lighting */}
-                    <ambientLight intensity={0.5} />
+                    <ambientLight intensity={0.8} />
                     <directionalLight
                         position={[10, 10, 5]}
-                        intensity={1}
+                        intensity={2.0}
                         castShadow
                         shadow-mapSize={[1024, 1024]}
                     >
                         <orthographicCamera attach="shadow-camera" args={[-10, 10, 10, -10]} />
                     </directionalLight>
+                    {/* Fill Light to reduce harsh shadows */}
+                    <directionalLight position={[-5, 5, 5]} intensity={1.0} />
 
                     {/* Environment Reflection */}
                     <Environment preset="city" />
 
-                    {/* Scroll Controls for Animation */}
-                    <ScrollControls pages={2} damping={0.2}>
-                        <group position={[0, -0.5, 0]}>
-                            <FloorPlan />
-                            <TechGrid />
-                        </group>
-                    </ScrollControls>
+                    {/* Scene Content */}
+                    <group position={[0, -0.5, 0]}>
+                        <FloorPlan scrollProgress={scrollProgress} />
+                        <TechGrid />
+                    </group>
 
                     {/* Shadows */}
                     <ContactShadows

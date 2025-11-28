@@ -59,7 +59,7 @@ const SimpleSearch = () => {
             property_types: userInput.propertyType ? [userInput.propertyType] : [],
             price_max: parseInt(userInput.budget) || 2000,
             price_min: 0,
-            location_center: userInput.location ? {
+            location_centre: userInput.location ? {
                 suburb: userInput.location,
                 lat: -33.8688, // Will be geocoded in production
                 lng: 151.2093
@@ -223,8 +223,8 @@ const SimpleSearch = () => {
                                         key={type.value}
                                         onClick={() => setUserInput({ ...userInput, propertyType: type.value })}
                                         className={`p-4 border transition-all ${userInput.propertyType === type.value
-                                                ? 'bg-signal border-signal text-white'
-                                                : 'bg-white/5 border-white/20 text-steel hover:border-signal hover:text-white'
+                                            ? 'bg-signal border-signal text-white'
+                                            : 'bg-white/5 border-white/20 text-steel hover:border-signal hover:text-white'
                                             }`}
                                     >
                                         <div className="text-3xl mb-2">{type.icon}</div>
@@ -259,8 +259,8 @@ const SimpleSearch = () => {
                                             mustHaves: toggleSelection(userInput.mustHaves, option.value)
                                         })}
                                         className={`p-4 border transition-all text-left ${userInput.mustHaves.includes(option.value)
-                                                ? 'bg-signal border-signal text-white'
-                                                : 'bg-white/5 border-white/20 text-steel hover:border-signal hover:text-white'
+                                            ? 'bg-signal border-signal text-white'
+                                            : 'bg-white/5 border-white/20 text-steel hover:border-signal hover:text-white'
                                             }`}
                                     >
                                         <div className="text-2xl mb-2">{option.icon}</div>
@@ -295,8 +295,8 @@ const SimpleSearch = () => {
                                             niceToHaves: toggleSelection(userInput.niceToHaves, option.value)
                                         })}
                                         className={`p-4 border transition-all text-left ${userInput.niceToHaves.includes(option.value)
-                                                ? 'bg-white/10 border-white/30 text-white'
-                                                : 'bg-white/5 border-white/20 text-steel hover:border-white/30 hover:text-white'
+                                            ? 'bg-white/10 border-white/30 text-white'
+                                            : 'bg-white/5 border-white/20 text-steel hover:border-white/30 hover:text-white'
                                             }`}
                                     >
                                         <div className="text-2xl mb-2">{option.icon}</div>

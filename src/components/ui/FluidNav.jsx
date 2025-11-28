@@ -23,18 +23,26 @@ const FluidNav = () => {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
             <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-                <a href="#" className="text-3xl font-display font-bold text-white tracking-tighter">
+                <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-3xl font-display font-bold text-white tracking-tighter">
                     nuu<span className="text-signal">.</span>
                 </a>
 
                 <div className="hidden md:flex items-center space-x-8">
                     {['OS', 'Intelligence', 'Manifesto'].map((item) => (
-                        <a key={item} href={`#${item.toLowerCase()}`} className="text-sm font-mono uppercase tracking-widest text-steel hover:text-white transition-colors">
+                        <a
+                            key={item}
+                            href={`#${item.toLowerCase()}`}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                document.getElementById(item.toLowerCase())?.scrollIntoView({ behavior: 'smooth' });
+                            }}
+                            className="text-sm font-mono uppercase tracking-widest text-steel hover:text-white transition-colors"
+                        >
                             {item}
                         </a>
                     ))}
                     <MagneticButton className="px-6 py-2 bg-white text-carbon font-bold font-mono uppercase tracking-wider rounded-none hover:bg-signal hover:text-white transition-colors">
-                        Initialize
+                        Initialise
                     </MagneticButton>
                 </div>
             </div>
