@@ -54,39 +54,51 @@ Sent from: nuu.agency
 Time: ${new Date().toISOString()}
     `.trim();
 
-    // Option 1: Send via Resend (if RESEND_API_KEY is set)
+    let emailSent = false;
+
+    // Try to send via Resend if configured
     if (process.env.RESEND_API_KEY) {
-      const resendResponse = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: 'NUU Contact <onboarding@resend.dev>',
-          to: process.env.CONTACT_EMAIL || 'hello@nuu.agency',
-          reply_to: email,
-          subject: `[NUU] ${subjectLabels[subject] || 'New Message'} from ${name}`,
-          text: emailContent,
-        }),
-      });
+      try {
+        // Use verified domain if available, otherwise use Resend's test domain
+        const fromEmail = process.env.RESEND_FROM_EMAIL || 'NUU Contact <onboarding@resend.dev>';
+        const toEmail = process.env.CONTACT_EMAIL || 'hello@nuu.agency';
 
-      if (!resendResponse.ok) {
-        const error = await resendResponse.text();
-        console.error('Resend error:', error);
-        throw new Error('Failed to send email via Resend');
+        const resendResponse = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: fromEmail,
+            to: toEmail,
+            reply_to: email,
+            subject: `[NUU] ${subjectLabels[subject] || 'New Message'} from ${name}`,
+            text: emailContent,
+          }),
+        });
+
+        if (resendResponse.ok) {
+          emailSent = true;
+          console.log(`✅ Contact form sent via Resend from ${email} to ${toEmail}`);
+        } else {
+          const errorText = await resendResponse.text();
+          console.error('Resend API error:', errorText);
+          // Don't throw - we'll still log the submission
+        }
+      } catch (resendError) {
+        console.error('Resend error:', resendError);
+        // Don't throw - we'll still log the submission
       }
+    }
 
-      console.log(`✅ Contact form sent via Resend from ${email}`);
-    }
-    // Option 2: Log to console (for development/when no email service)
-    else {
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      console.log('📧 NEW CONTACT FORM SUBMISSION');
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      console.log(emailContent);
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    }
+    // Always log the submission for backup
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('📧 NEW CONTACT FORM SUBMISSION');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log(`Email sent: ${emailSent ? 'Yes' : 'No (logged only)'}`);
+    console.log(emailContent);
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
     // Store in Supabase if configured
     if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
@@ -107,6 +119,7 @@ Time: ${new Date().toISOString()}
               phone: phone || null,
               subject,
               message,
+              email_sent: emailSent,
               created_at: new Date().toISOString()
             }),
           }
@@ -114,6 +127,9 @@ Time: ${new Date().toISOString()}
 
         if (supabaseResponse.ok) {
           console.log('✅ Contact saved to Supabase');
+        } else {
+          const dbError = await supabaseResponse.text();
+          console.log('Supabase response:', dbError);
         }
       } catch (dbError) {
         // Don't fail the request if DB save fails
@@ -121,6 +137,7 @@ Time: ${new Date().toISOString()}
       }
     }
 
+    // Always return success - the submission is logged
     return res.status(200).json({ 
       success: true, 
       message: 'Thank you for your message. We\'ll be in touch soon!' 
@@ -133,4 +150,3 @@ Time: ${new Date().toISOString()}
     });
   }
 }
-
