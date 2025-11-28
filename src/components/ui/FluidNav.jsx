@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import MagneticButton from './MagneticButton';
+import { useContact } from '../../App';
 
 const FluidNav = () => {
     const { scrollY } = useScroll();
     const [isScrolled, setIsScrolled] = useState(false);
+    const { openContact } = useContact();
 
     useMotionValueEvent(scrollY, "change", (latest) => {
         if (latest > 50) {
@@ -41,10 +43,21 @@ const FluidNav = () => {
                             {item}
                         </a>
                     ))}
-                    <MagneticButton className="px-6 py-2 bg-white text-carbon font-bold font-mono uppercase tracking-wider rounded-none hover:bg-signal hover:text-white transition-colors">
-                        Initialise
+                    <MagneticButton 
+                        onClick={openContact}
+                        className="px-6 py-2 bg-white text-carbon font-bold font-mono uppercase tracking-wider rounded-none hover:bg-signal hover:text-white transition-colors"
+                    >
+                        Contact Us
                     </MagneticButton>
                 </div>
+
+                {/* Mobile menu button */}
+                <button 
+                    onClick={openContact}
+                    className="md:hidden px-4 py-2 bg-white text-carbon font-bold font-mono text-xs uppercase tracking-wider"
+                >
+                    Contact
+                </button>
             </div>
         </motion.nav>
     );

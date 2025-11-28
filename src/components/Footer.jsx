@@ -1,6 +1,9 @@
 import React from 'react';
+import { useContact } from '../App';
 
 const Footer = () => {
+    const { openContact } = useContact();
+
     return (
         <footer className="bg-carbon border-t border-white/10 pt-20 pb-10">
             <div className="max-w-7xl mx-auto px-6">
@@ -19,18 +22,54 @@ const Footer = () => {
                     <div>
                         <h4 className="text-white font-mono text-sm font-bold mb-6 uppercase tracking-wider">Index</h4>
                         <ul className="space-y-4 text-steel font-mono text-sm">
-                            <li><a href="#" className="hover:text-white transition-colors">[ SEARCH ]</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">[ PROTOCOL ]</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">[ PRICING ]</a></li>
+                            <li>
+                                <a 
+                                    href="#intelligence" 
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        document.getElementById('intelligence')?.scrollIntoView({ behavior: 'smooth' });
+                                    }}
+                                    className="hover:text-white transition-colors"
+                                >
+                                    [ SEARCH ]
+                                </a>
+                            </li>
+                            <li>
+                                <a 
+                                    href="#os" 
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        document.getElementById('os')?.scrollIntoView({ behavior: 'smooth' });
+                                    }}
+                                    className="hover:text-white transition-colors"
+                                >
+                                    [ PROTOCOL ]
+                                </a>
+                            </li>
+                            <li>
+                                <button 
+                                    onClick={openContact}
+                                    className="hover:text-white transition-colors"
+                                >
+                                    [ CONTACT ]
+                                </button>
+                            </li>
                         </ul>
                     </div>
 
                     <div>
                         <h4 className="text-white font-mono text-sm font-bold mb-6 uppercase tracking-wider">Network</h4>
                         <ul className="space-y-4 text-steel font-mono text-sm">
-                            <li><a href="#" className="hover:text-white transition-colors">INSTAGRAM</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">TWITTER</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">CONTACT</a></li>
+                            <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">INSTAGRAM</a></li>
+                            <li><a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">TWITTER</a></li>
+                            <li>
+                                <a 
+                                    href="mailto:hello@nuu.agency" 
+                                    className="hover:text-white transition-colors"
+                                >
+                                    EMAIL
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>
