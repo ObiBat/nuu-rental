@@ -25,7 +25,7 @@ const Hero = () => {
                         </motion.div>
                     </div>
 
-                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-display font-bold text-white tracking-tighter mb-10 leading-[0.9]">
+                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white tracking-tighter mb-8 leading-[0.9]">
                         <TextReveal text="THE RENTAL" />
                         <span className="block text-steel"><TextReveal text="OPERATING" delay={0.2} /></span>
                         <TextReveal text="SYSTEM." delay={0.4} />
@@ -35,16 +35,16 @@ const Hero = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.8, duration: 1 }}
-                        className="max-w-xl text-lg md:text-xl text-steel mb-16 font-light leading-relaxed border-l border-white/20 pl-8 ml-2"
+                        className="max-w-lg text-base md:text-lg text-steel mb-10 font-light leading-relaxed border-l border-white/20 pl-6 ml-1"
                     >
                         Don't just move. Upgrade. NUU connects you to the housing market with algorithmic precision and industrial efficiency.
                     </motion.p>
 
-                    <div className="flex flex-col sm:flex-row items-start gap-6 ml-2">
-                        <MagneticButton className="px-12 py-6 bg-signal text-white font-bold font-mono uppercase tracking-wider rounded-none text-lg hover:bg-white hover:text-carbon transition-all signal-glow min-w-[200px] flex justify-center">
+                    <div className="flex flex-col sm:flex-row items-start gap-4 ml-1">
+                        <MagneticButton className="px-8 py-4 bg-signal text-white font-bold font-mono uppercase tracking-wider rounded-none text-sm hover:bg-white hover:text-carbon transition-all signal-glow min-w-[160px] flex justify-center">
                             Start Sequence
                         </MagneticButton>
-                        <MagneticButton className="px-12 py-6 bg-transparent border border-white/20 text-white font-bold font-mono uppercase tracking-wider rounded-none text-lg hover:bg-white/5 transition-all min-w-[200px] flex justify-center">
+                        <MagneticButton className="px-8 py-4 bg-transparent border border-white/20 text-white font-bold font-mono uppercase tracking-wider rounded-none text-sm hover:bg-white/5 transition-all min-w-[160px] flex justify-center">
                             Read Manifesto
                         </MagneticButton>
                     </div>

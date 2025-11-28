@@ -5,10 +5,6 @@
       <stop offset="50%" style="stop-color:#0f0f0f"/>
       <stop offset="100%" style="stop-color:#1a1a1a"/>
     </linearGradient>
-    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#FF4D00"/>
-      <stop offset="100%" style="stop-color:#FF6B2C"/>
-    </linearGradient>
     <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
       <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
     </pattern>
@@ -19,38 +15,43 @@
   <rect width="1200" height="630" fill="url(#grid)"/>
   
   <!-- Accent line at top -->
-  <rect x="0" y="0" width="1200" height="4" fill="url(#accentGrad)"/>
+  <rect x="0" y="0" width="1200" height="4" fill="#FF4D00"/>
   
-  <!-- Logo Mark -->
-  <g transform="translate(80, 180)">
-    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M0 200 L0 0" stroke="#ffffff" stroke-width="28"/>
-      <path d="M0 0 L200 200" stroke="url(#accentGrad)" stroke-width="28"/>
-      <path d="M200 0 L200 200" stroke="#ffffff" stroke-width="28"/>
-      <circle cx="0" cy="0" r="14" fill="#FF4D00"/>
-      <circle cx="200" cy="200" r="14" fill="#FF4D00"/>
-    </g>
+  <!-- Logo: nuu. -->
+  <g font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif">
+    <text x="80" y="320" font-size="180" font-weight="800" fill="#ffffff" letter-spacing="-8">nuu</text>
+    <text x="420" y="320" font-size="180" font-weight="800" fill="#FF4D00">.</text>
   </g>
   
-  <!-- Text Content -->
-  <g font-family="system-ui, -apple-system, sans-serif">
-    <!-- Brand name -->
-    <text x="340" y="280" font-size="120" font-weight="800" fill="#ffffff" letter-spacing="-4">nuu.</text>
-    
-    <!-- Tagline -->
-    <text x="340" y="350" font-size="32" font-weight="400" fill="#888888" letter-spacing="8" text-transform="uppercase">THE RENTAL OPERATING SYSTEM</text>
-    
-    <!-- Description -->
-    <text x="340" y="420" font-size="24" font-weight="400" fill="#666666">AI-powered property search with GPT-4o</text>
-  </g>
+  <!-- Tagline -->
+  <text 
+    x="80" 
+    y="400" 
+    font-family="monospace" 
+    font-size="24" 
+    fill="#666666" 
+    letter-spacing="6"
+  >THE RENTAL OPERATING SYSTEM</text>
+  
+  <!-- Description -->
+  <text 
+    x="80" 
+    y="450" 
+    font-family="system-ui, sans-serif" 
+    font-size="20" 
+    fill="#555555"
+  >AI-powered property search with GPT-4o</text>
   
   <!-- URL -->
-  <text x="80" y="580" font-family="monospace" font-size="18" fill="#FF4D00">nuu.agency</text>
+  <text 
+    x="80" 
+    y="580" 
+    font-family="monospace" 
+    font-size="18" 
+    fill="#FF4D00"
+  >nuu.agency</text>
   
-  <!-- Version badge -->
-  <g transform="translate(1040, 555)">
-    <rect x="0" y="0" width="80" height="28" rx="4" fill="rgba(255,77,0,0.2)" stroke="#FF4D00" stroke-width="1"/>
-    <text x="40" y="19" font-family="monospace" font-size="12" fill="#FF4D00" text-anchor="middle">v2.0</text>
-  </g>
+  <!-- Decorative elements -->
+  <rect x="1040" y="555" width="80" height="28" rx="4" fill="rgba(255,77,0,0.15)" stroke="#FF4D00" stroke-width="1"/>
+  <text x="1080" y="574" font-family="monospace" font-size="12" fill="#FF4D00" text-anchor="middle">v2.0</text>
 </svg>
-
