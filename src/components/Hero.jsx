@@ -2,58 +2,73 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import TextReveal from './ui/TextReveal';
 import MagneticButton from './ui/MagneticButton';
-import ScrollSection from './ui/ScrollSection';
+import ArchitecturalScene from './3d/ArchitecturalScene';
 
 const Hero = () => {
     return (
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-carbon grid-bg">
-            <div className="relative z-10 max-w-7xl mx-auto px-6">
-                <ScrollSection>
-                    <div className="flex flex-col items-start">
+        <section className="relative min-h-screen flex items-center pt-32 pb-20 overflow-hidden bg-carbon">
+            {/* 3D Background */}
+            <ArchitecturalScene />
+
+            {/* Content */}
+            <div className="relative z-20 max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div className="lg:col-span-7">
+                    <div className="mb-8 overflow-hidden">
                         <motion.div
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.8 }}
-                            className="mb-8 flex items-center space-x-4"
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            className="flex items-center gap-3 text-signal font-mono text-sm tracking-[0.2em] uppercase"
                         >
-                            <div className="h-px w-12 bg-signal" />
-                            <span className="text-sm font-mono text-signal uppercase tracking-widest">System Online v2.0</span>
+                            <span className="w-2 h-2 bg-signal rounded-full animate-pulse shadow-[0_0_10px_#ff4d00]" />
+                            nuu.agency
                         </motion.div>
-
-                        <h1 className="text-6xl md:text-8xl lg:text-9xl font-display font-bold text-white tracking-tighter mb-8 leading-[0.9]">
-                            <TextReveal text="THE RENTAL" />
-                            <span className="block text-steel"><TextReveal text="OPERATING" delay={0.2} /></span>
-                            <TextReveal text="SYSTEM." delay={0.4} />
-                        </h1>
-
-                        <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.8, duration: 1 }}
-                            className="max-w-xl text-lg md:text-xl text-steel mb-12 font-light leading-relaxed border-l border-white/20 pl-6"
-                        >
-                            Don't just move. Upgrade. NUU connects you to the housing market with algorithmic precision and industrial efficiency.
-                        </motion.p>
-
-                        <div className="flex flex-col sm:flex-row items-center gap-6">
-                            <MagneticButton className="px-10 py-5 bg-signal text-white font-bold font-mono uppercase tracking-wider rounded-none text-lg hover:bg-white hover:text-carbon transition-all signal-glow">
-                                Start Sequence
-                            </MagneticButton>
-                            <MagneticButton className="px-10 py-5 bg-transparent border border-white/20 text-white font-bold font-mono uppercase tracking-wider rounded-none text-lg hover:bg-white/5 transition-all">
-                                Read Manifesto
-                            </MagneticButton>
-                        </div>
                     </div>
-                </ScrollSection>
+
+                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-display font-bold text-white tracking-tighter mb-10 leading-[0.9]">
+                        <TextReveal text="THE RENTAL" />
+                        <span className="block text-steel"><TextReveal text="OPERATING" delay={0.2} /></span>
+                        <TextReveal text="SYSTEM." delay={0.4} />
+                    </h1>
+
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.8, duration: 1 }}
+                        className="max-w-xl text-lg md:text-xl text-steel mb-16 font-light leading-relaxed border-l border-white/20 pl-8 ml-2"
+                    >
+                        Don't just move. Upgrade. NUU connects you to the housing market with algorithmic precision and industrial efficiency.
+                    </motion.p>
+
+                    <div className="flex flex-col sm:flex-row items-start gap-6 ml-2">
+                        <MagneticButton className="px-12 py-6 bg-signal text-white font-bold font-mono uppercase tracking-wider rounded-none text-lg hover:bg-white hover:text-carbon transition-all signal-glow min-w-[200px] flex justify-center">
+                            Start Sequence
+                        </MagneticButton>
+                        <MagneticButton className="px-12 py-6 bg-transparent border border-white/20 text-white font-bold font-mono uppercase tracking-wider rounded-none text-lg hover:bg-white/5 transition-all min-w-[200px] flex justify-center">
+                            Read Manifesto
+                        </MagneticButton>
+                    </div>
+                </div>
             </div>
 
             {/* Decorative Elements */}
-            <div className="absolute bottom-0 right-0 w-1/3 h-1/3 border-t border-l border-white/10 p-8 flex items-end justify-end">
+            <div className="absolute bottom-12 right-12 border-t border-l border-white/10 p-8 flex items-end justify-end pointer-events-none hidden md:block">
                 <div className="text-right">
-                    <p className="text-steel font-mono text-xs">COORDINATES</p>
+                    <p className="text-steel font-mono text-xs tracking-widest mb-1">COORDINATES</p>
                     <p className="text-white font-mono text-sm">33.8688° S, 151.2093° E</p>
                 </div>
             </div>
+
+            {/* Scroll Indicator */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.5, duration: 1 }}
+                className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none"
+            >
+                <span className="text-steel font-mono text-[10px] uppercase tracking-widest">Scroll to Assemble</span>
+                <div className="w-px h-12 bg-gradient-to-b from-signal to-transparent" />
+            </motion.div>
         </section>
     );
 };

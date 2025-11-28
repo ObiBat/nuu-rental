@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0a"/>
+      <stop offset="100%" style="stop-color:#141414"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background - iOS requires full coverage -->
+  <rect width="180" height="180" fill="url(#bgGrad)"/>
+  
+  <!-- N Mark centered -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(40, 40)">
+    <path d="M0 100 L0 0" stroke="#ffffff" stroke-width="16"/>
+    <path d="M0 0 L100 100" stroke="#FF4D00" stroke-width="16"/>
+    <path d="M100 0 L100 100" stroke="#ffffff" stroke-width="16"/>
+    
+    <!-- Accent dots -->
+    <circle cx="0" cy="0" r="8" fill="#FF4D00"/>
+    <circle cx="100" cy="100" r="8" fill="#FF4D00"/>
+  </g>
+</svg>
+
