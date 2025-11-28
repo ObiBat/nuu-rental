@@ -2,13 +2,13 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase
-const supabase = createClient(
+const getSupabase = () => createClient(
   process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_KEY!
 );
 
 // Store sessions in memory (for serverless, consider using Redis or Supabase)
-const sessions: Map<string, any> = new Map();
+const sessions: Map<string, AIConversationEngine> = new Map();
 
 // AI Engine implementation
 class AIConversationEngine {
@@ -52,6 +52,11 @@ Always respond with valid JSON:
     "quick_replies": ["Option 1", "Option 2"]
 }
 
+BUDGET INTERPRETATION:
+- "under $X" → budget_weekly: X
+- "over $X" → budget_min_weekly: X
+- "$X-$Y" → budget_min_weekly: X, budget_weekly: Y
+
 Set "ready_to_search": true when you have: location + budget (minimum required)`;
 
     try {
@@ -73,7 +78,7 @@ Set "ready_to_search": true when you have: location + budget (minimum required)`
       });
 
       const data = await response.json();
-      const content = data.choices[0].message.content;
+      const content = data.choices?.[0]?.message?.content || '';
       
       // Parse JSON response
       const jsonMatch = content.match(/\{[\s\S]*\}/);
@@ -84,10 +89,10 @@ Set "ready_to_search": true when you have: location + budget (minimum required)`
       }
 
       return {
-        message: content,
+        message: content || "I'm having trouble understanding. Could you tell me more about what you're looking for?",
         preferences: {},
         ready_to_search: false,
-        quick_replies: []
+        quick_replies: ["Near the beach", "Inner city", "Under $700/wk"]
       };
     } catch (error) {
       console.error('AI Error:', error);
@@ -98,6 +103,10 @@ Set "ready_to_search": true when you have: location + budget (minimum required)`
         quick_replies: []
       };
     }
+  }
+
+  reset() {
+    this.conversationHistory = [];
   }
 }
 
@@ -114,6 +123,10 @@ function calculateMatch(property: any, preferences: any) {
     if (requestedSuburbs.some((rs: string) => propertySuburb.includes(rs) || rs.includes(propertySuburb))) {
       score += 25;
       breakdown.location = `✓ ${property.suburb}`;
+    } else {
+      // Partial location score for nearby suburbs
+      score += 5;
+      breakdown.location = property.suburb;
     }
   }
 
@@ -137,6 +150,14 @@ function calculateMatch(property: any, preferences: any) {
       score -= Math.min(20, over / 20);
       breakdown.budget = `$${over}/wk over`;
     }
+  } else if (preferences.budget_min_weekly) {
+    if (rent >= preferences.budget_min_weekly) {
+      score += 15;
+      breakdown.budget = `$${rent}/wk ✓`;
+    } else {
+      score -= 10;
+      breakdown.budget = `Below minimum`;
+    }
   }
 
   // Features matching
@@ -148,6 +169,15 @@ function calculateMatch(property: any, preferences: any) {
         score += 5;
         breakdown.features.push(feature);
       }
+    }
+  }
+
+  // Bedrooms matching
+  if (preferences.bedrooms && property.bedrooms) {
+    if (property.bedrooms === preferences.bedrooms) {
+      score += 10;
+    } else if (Math.abs(property.bedrooms - preferences.bedrooms) === 1) {
+      score += 5;
     }
   }
 
@@ -174,6 +204,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const { session_id, message } = req.body;
 
+    if (!session_id || !message) {
+      return res.status(400).json({ error: 'session_id and message are required' });
+    }
+
     // Get or create session
     let engine = sessions.get(session_id);
     if (!engine) {
@@ -186,6 +220,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // If ready to search, perform the search
     if (aiResponse.ready_to_search) {
+      const supabase = getSupabase();
       let query = supabase.from('properties').select('*');
       
       if (aiResponse.preferences.budget_weekly) {
@@ -198,18 +233,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         query = query.gte('rent_weekly', minBudget);
       }
 
-      const { data: properties } = await query.limit(50);
+      const { data: properties, error } = await query.limit(50);
+
+      if (error) {
+        console.error('Supabase error:', error);
+      }
 
       if (properties?.length) {
-        const scoredProperties = properties.map(p => {
+        const scoredProperties = properties.map((p: any) => {
           const match = calculateMatch(p, aiResponse.preferences);
           return { ...p, matchScore: match.score, matchBreakdown: match.breakdown };
         });
 
-        scoredProperties.sort((a, b) => b.matchScore - a.matchScore);
+        scoredProperties.sort((a: any, b: any) => b.matchScore - a.matchScore);
         const topResults = scoredProperties.slice(0, 5);
 
-        const resultsWithExplanations = topResults.slice(0, 3).map(p => {
+        const resultsWithExplanations = topResults.slice(0, 3).map((p: any) => {
           const parts = [];
           if (p.matchBreakdown.location) parts.push(p.matchBreakdown.location);
           if (p.matchBreakdown.budget) parts.push(p.matchBreakdown.budget);
@@ -234,4 +273,3 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
-
