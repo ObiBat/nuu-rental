@@ -44,7 +44,7 @@ const Hero = () => {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.8, duration: 1 }}
-                            className="max-w-lg text-base md:text-lg text-steel mb-10 font-light leading-relaxed border-l border-white/20 pl-6 ml-1"
+                            className="max-w-lg text-base md:text-lg text-white/90 md:text-steel mb-10 font-light leading-relaxed border-l border-white/30 md:border-white/20 pl-6 ml-1"
                         >
                             Don't just move. Upgrade. NUU connects you to the housing market with algorithmic precision and industrial efficiency.
                         </motion.p>
